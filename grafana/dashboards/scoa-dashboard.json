@@ -1,0 +1,277 @@
+{
+  "id": null,
+  "title": "SCOA稳定币套利策略监控",
+  "tags": ["crypto", "arbitrage", "stablecoin", "scoa"],
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Binance 资金曲线",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "none",
+          "displayName": "Binance"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "mean", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "HTX 资金曲线",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "none",
+          "displayName": "HTX"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "mean", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Binance 当前资金 ($)",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> last()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "custom": {
+            "displayMode": "basic"
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Binance 收益率 (24h)",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "import \"math\"\n\ncurrent = from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> last()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nstart = from(bucket: \"trading_data\")\n  |> range(start: -24h, stop: -23h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> first()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nyield(name: \"pct_change\")\n  |> map(fn: (r) => ({r with _value: (current._value - start._value) / start._value * 100.0}))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 3,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 0},
+              {"color": "green", "value": 0.1}
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 5,
+      "title": "HTX 当前资金 ($)",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> last()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "custom": {
+            "displayMode": "basic"
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 6,
+      "title": "HTX 收益率 (24h)",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "import \"math\"\n\ncurrent = from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> last()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nstart = from(bucket: \"trading_data\")\n  |> range(start: -24h, stop: -23h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> first()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nyield(name: \"pct_change\")\n  |> map(fn: (r) => ({r with _value: (current._value - start._value) / start._value * 100.0}))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 3,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {"color": "red", "value": null},
+              {"color": "yellow", "value": 0},
+              {"color": "green", "value": 0.1}
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    }
+  ],
+  "timezone": "",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "schemaVersion": 39,
+  "style": "dark",
+  "version": 0
+}

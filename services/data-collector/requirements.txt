@@ -1,0 +1,21 @@
+# Trading and Exchange APIs
+ccxt>=4.1.0
+
+# Data handling and storage
+pandas>=2.0.0
+numpy>=1.24.0
+influxdb-client>=1.38.0
+
+# Configuration and utilities
+PyYAML>=6.0
+schedule>=1.2.0
+
+# HTTP and API requests
+requests>=2.31.0
+aiohttp>=3.8.0
+
+# Logging
+loguru>=0.7.0
+
+# Async support
+asyncio

@@ -1,0 +1,81 @@
+services:
+  # InfluxDB - Time Series Database
+  influxdb:
+    image: influxdb:2.7
+    container_name: scoa-influxdb
+    restart: unless-stopped
+    ports:
+      - "8088:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password123
+      - DOCKER_INFLUXDB_INIT_ORG=scoa
+      - DOCKER_INFLUXDB_INIT_BUCKET=trading_data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=scoa-admin-token-change-this
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - ./docker/influxdb/config:/etc/influxdb2
+    networks:
+      - scoa-network
+
+  # Grafana - Visualization and Dashboards
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: scoa-grafana
+    restart: unless-stopped
+    ports:
+      - "3033:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-worldmap-panel,grafana-simple-json-datasource
+      - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - scoa-network
+    depends_on:
+      - influxdb
+
+  # Data Collector Service
+  data-collector:
+    build:
+      context: ./services/data-collector
+      dockerfile: Dockerfile
+    container_name: scoa-data-collector
+    restart: unless-stopped
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=scoa-admin-token-change-this
+      - INFLUXDB_ORG=scoa
+      - INFLUXDB_BUCKET=trading_data
+    volumes:
+      - ./config:/app/config
+      - ./logs:/app/logs
+    networks:
+      - scoa-network
+    depends_on:
+      - influxdb
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: scoa-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - scoa-network
+
+volumes:
+  influxdb_data:
+  grafana_data:
+  redis_data:
+
+networks:
+  scoa-network:
+    driver: bridge

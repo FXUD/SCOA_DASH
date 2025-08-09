@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    uid: influxdb
+    isDefault: true
+    jsonData:
+      version: Flux
+      organization: scoa
+      defaultBucket: trading_data
+      maxSeries: 1000
+    secureJsonData:
+      token: G3TCJ15-xMa_rBb_sQtouEVCp6745x_P86LLJmXfJYiDfQskYcaH53j5tO1W5xJFQJOl9SIATKz0tElJj6uHXw==
+    editable: true

@@ -1,0 +1,25 @@
+# Trading and Exchange APIs
+ccxt>=4.1.0
+python-binance>=1.0.17
+
+# Data handling and storage
+pandas>=2.0.0
+numpy>=1.24.0
+influxdb-client>=1.38.0
+
+# Configuration and utilities
+PyYAML>=6.0
+python-dotenv>=1.0.0
+schedule>=1.2.0
+
+# HTTP and API requests
+requests>=2.31.0
+aiohttp>=3.8.0
+
+# Logging and monitoring
+loguru>=0.7.0
+
+# Development
+pytest>=7.4.0
+black>=23.0.0
+flake8>=6.0.0
