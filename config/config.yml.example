@@ -1,6 +1,6 @@
-# SCOA Dashboard Configuration - Production
-# This file contains actual configuration values
-# Copy from config.example.yml and modify as needed
+# SCOA Dashboard Configuration - Example
+# Copy this file to config.yml and modify with your actual values
+# DO NOT commit config.yml with real API keys to Git!
 
 app:
   name: "SCOA Crypto Trading Dashboard"
@@ -18,7 +18,7 @@ influxdb:
   password: "password123"
   bucket: "trading_data"
   organization: "scoa"
-  token: "scoa-admin-token-change-this"
+  token: "your-influxdb-token-here"
   timeout: 30
 
 # Data Collection Settings
@@ -32,10 +32,10 @@ data_collection:
 # Exchanges Configuration
 exchanges:
   binance:
-    enabled: true  # Set to true and add your API keys
+    enabled: false  # Set to true and add your API keys
     name: "Binance"
-    api_key: "a8J619uaVgKd4Tq2xdloBxfd0RfqJJi7CQZ0fK9OCU56SvxYk66mACyxFbdN4kJU"
-    api_secret: "UEMH15lbSSHqk1Ldf0Ho8TNnATrxh4MBJnBF7aA4m3CFaZbjf0iwp9jzW7UhGIEJ"
+    api_key: "your-binance-api-key-here"
+    api_secret: "your-binance-api-secret-here"
     sandbox: false
     rate_limit: 120  # requests per minute
     symbols:
@@ -45,10 +45,10 @@ exchanges:
       testnet: "https://testnet.binance.vision"
     
   htx:
-    enabled: true  # Set to true and add your API keys
+    enabled: false  # Set to true and add your API keys
     name: "HTX (Huobi)"
-    api_key: "d617db23-b1rkuf4drg-21c2e18e-227c8"
-    api_secret: "692a898e-b33ad56f-2f409119-4759a"
+    api_key: "your-htx-api-key-here"
+    api_secret: "your-htx-api-secret-here"
     sandbox: false
     rate_limit: 100  # requests per second
     symbols:
