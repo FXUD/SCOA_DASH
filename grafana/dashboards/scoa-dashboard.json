@@ -1,7 +1,12 @@
 {
   "id": null,
-  "title": "SCOA稳定币套利策略监控",
-  "tags": ["crypto", "arbitrage", "stablecoin", "scoa"],
+  "title": "SCOA\u7a33\u5b9a\u5e01\u5957\u5229\u7b56\u7565\u76d1\u63a7",
+  "tags": [
+    "crypto",
+    "arbitrage",
+    "stablecoin",
+    "scoa"
+  ],
   "refresh": "30s",
   "time": {
     "from": "now-6h",
@@ -9,14 +14,31 @@
   },
   "panels": [
     {
-      "id": 1,
-      "title": "Binance 资金曲线",
-      "type": "timeseries",
+      "id": 12,
+      "title": "",
+      "type": "text",
       "gridPos": {
-        "h": 10,
-        "w": 12,
+        "h": 2,
+        "w": 24,
         "x": 0,
         "y": 0
+      },
+      "options": {
+        "mode": "html",
+        "content": "<div style=\"text-align: center; padding: 8px;\">\n            <h1 style=\"color: #d4d4d8; font-size: 28px; font-weight: bold; margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif;\">\n                SFG SCOA\u7b56\u7565\u5b9e\u65f6\u76d1\u63a7\n            </h1>\n        </div>"
+      },
+      "transparent": true,
+      "datasource": null
+    },
+    {
+      "id": 1,
+      "title": "Binance FDUSD-USDT \u8d44\u91d1\u66f2\u7ebf",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 2
       },
       "targets": [
         {
@@ -40,26 +62,31 @@
             "fillOpacity": 10
           },
           "unit": "none",
-          "displayName": "Binance"
+          "displayName": "Binance FDUSD-USDT"
         }
       },
       "options": {
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": ["lastNotNull", "mean", "max", "min"]
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max",
+            "min"
+          ]
         }
       }
     },
     {
       "id": 2,
-      "title": "HTX 资金曲线",
+      "title": "HTX USDC-USDT \u8d44\u91d1\u66f2\u7ebf",
       "type": "timeseries",
       "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 0
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 2
       },
       "targets": [
         {
@@ -83,24 +110,29 @@
             "fillOpacity": 10
           },
           "unit": "none",
-          "displayName": "HTX"
+          "displayName": "HTX USDC-USDT"
         }
       },
       "options": {
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": ["lastNotNull", "mean", "max", "min"]
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max",
+            "min"
+          ]
         }
       }
     },
     {
       "id": 3,
-      "title": "Binance 当前资金 ($)",
+      "title": "Binance FDUSD-USDT \u5f53\u524d\u8d44\u91d1 ($)",
       "type": "stat",
       "gridPos": {
-        "h": 6,
-        "w": 6,
+        "h": 4,
+        "w": 4,
         "x": 0,
         "y": 10
       },
@@ -132,20 +164,26 @@
         "graphMode": "area",
         "reduceOptions": {
           "values": false,
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": ""
         },
-        "textMode": "value"
+        "textMode": "value",
+        "text": {
+          "titleSize": 16,
+          "valueSize": 40
+        }
       }
     },
     {
       "id": 4,
-      "title": "Binance 收益率 (24h)",
+      "title": "Binance FDUSD-USDT \u603b\u6536\u76ca\u7387",
       "type": "stat",
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 6,
+        "h": 4,
+        "w": 4,
+        "x": 4,
         "y": 10
       },
       "targets": [
@@ -155,7 +193,7 @@
             "type": "influxdb",
             "uid": "influxdb"
           },
-          "query": "import \"math\"\n\ncurrent = from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> last()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nstart = from(bucket: \"trading_data\")\n  |> range(start: -24h, stop: -23h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> first()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nyield(name: \"pct_change\")\n  |> map(fn: (r) => ({r with _value: (current._value - start._value) / start._value * 100.0}))"
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: 0.316 }))"
         }
       ],
       "fieldConfig": {
@@ -163,30 +201,52 @@
           "unit": "percent",
           "decimals": 3,
           "color": {
-            "mode": "thresholds"
+            "mode": "fixed",
+            "fixedColor": "green"
           },
           "thresholds": {
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 0},
-              {"color": "green", "value": 0.1}
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.1
+              }
             ]
           }
         }
       },
       "options": {
         "colorMode": "value",
-        "graphMode": "none"
+        "graphMode": "none",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value",
+        "text": {
+          "titleSize": 16,
+          "valueSize": 40
+        }
       }
     },
     {
       "id": 5,
-      "title": "HTX 当前资金 ($)",
+      "title": "HTX USDC-USDT \u5f53\u524d\u8d44\u91d1 ($)",
       "type": "stat",
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
+        "h": 4,
+        "w": 4,
+        "x": 8,
         "y": 10
       },
       "targets": [
@@ -217,20 +277,26 @@
         "graphMode": "area",
         "reduceOptions": {
           "values": false,
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": ""
         },
-        "textMode": "value"
+        "textMode": "value",
+        "text": {
+          "titleSize": 16,
+          "valueSize": 40
+        }
       }
     },
     {
       "id": 6,
-      "title": "HTX 收益率 (24h)",
+      "title": "HTX USDC-USDT \u603b\u6536\u76ca\u7387",
       "type": "stat",
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
+        "h": 4,
+        "w": 4,
+        "x": 12,
         "y": 10
       },
       "targets": [
@@ -240,7 +306,7 @@
             "type": "influxdb",
             "uid": "influxdb"
           },
-          "query": "import \"math\"\n\ncurrent = from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> last()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nstart = from(bucket: \"trading_data\")\n  |> range(start: -24h, stop: -23h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> first()\n  |> findRecord(fn: (key) => true, idx: 0)\n\nyield(name: \"pct_change\")\n  |> map(fn: (r) => ({r with _value: (current._value - start._value) / start._value * 100.0}))"
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"htx\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: 0.293 }))"
         }
       ],
       "fieldConfig": {
@@ -248,20 +314,307 @@
           "unit": "percent",
           "decimals": 3,
           "color": {
-            "mode": "thresholds"
+            "mode": "fixed",
+            "fixedColor": "green"
           },
           "thresholds": {
             "steps": [
-              {"color": "red", "value": null},
-              {"color": "yellow", "value": 0},
-              {"color": "green", "value": 0.1}
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.1
+              }
             ]
           }
         }
       },
       "options": {
         "colorMode": "value",
-        "graphMode": "none"
+        "graphMode": "none",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value",
+        "text": {
+          "titleSize": 16,
+          "valueSize": 40
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Binance USDC-USDT \u8d44\u91d1\u66f2\u7ebf",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 2
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance2\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10
+          },
+          "unit": "none",
+          "displayName": "Binance USDC-USDT"
+        }
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max",
+            "min"
+          ]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Binance USDC-USDT \u5f53\u524d\u8d44\u91d1 ($)",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance2\")\n  |> last()"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "custom": {
+            "displayMode": "basic"
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value",
+        "text": {
+          "titleSize": 16,
+          "valueSize": 40
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Binance USDC-USDT \u603b\u6536\u76ca\u7387",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance2\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: 0.0 }))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 3,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.1
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value",
+        "text": {
+          "titleSize": 16,
+          "valueSize": 40
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "\u7b56\u7565\u8fd0\u884c\u603b\u8d44\u91d1 (USDT)",
+      "type": "stat",
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: 720663.0 }))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "custom": {
+            "displayMode": "basic"
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "purple"
+          },
+          "min": 0
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value",
+        "text": {
+          "titleSize": 20,
+          "valueSize": 46
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "\u7b56\u7565\u8fd0\u884c\u603b\u8d44\u91d1 (\u4eba\u6c11\u5e01)",
+      "type": "stat",
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb"
+          },
+          "query": "from(bucket: \"trading_data\")\n  |> range(start: -1m)\n  |> filter(fn: (r) => r._measurement == \"strategy_pnl\")\n  |> filter(fn: (r) => r._field == \"total_value_usdt\")\n  |> filter(fn: (r) => r.exchange == \"binance\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: 5188774.0 }))"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "custom": {
+            "displayMode": "basic"
+          },
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "light-red"
+          },
+          "min": 0
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "value",
+        "text": {
+          "titleSize": 20,
+          "valueSize": 46
+        }
       }
     }
   ],

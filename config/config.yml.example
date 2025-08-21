@@ -57,6 +57,19 @@ exchanges:
       api: "https://api.huobi.pro"
       websocket: "wss://api.huobi.pro/ws"
 
+  binance2:
+    enabled: false  # Set to true and add your API keys
+    name: "Binance Account 2"
+    api_key: "your-binance2-api-key-here"
+    api_secret: "your-binance2-api-secret-here"
+    sandbox: false
+    rate_limit: 120  # requests per minute
+    symbols:
+      - "FDUSDUSDT"
+    urls:
+      api: "https://api.binance.com"
+      testnet: "https://testnet.binance.vision"
+
 # Monitoring Settings
 monitoring:
   health_check_interval: 60  # seconds

@@ -189,18 +189,19 @@ class SimpleCollector:
         """设置交易所连接"""
         self.exchanges = {}
         
-        # Binance
-        if self.config['exchanges']['binance']['enabled']:
-            try:
-                self.exchanges['binance'] = ccxt.binance({
-                    'apiKey': self.config['exchanges']['binance']['api_key'],
-                    'secret': self.config['exchanges']['binance']['api_secret'],
-                    'sandbox': self.config['exchanges']['binance']['sandbox'],
-                    'enableRateLimit': True,
-                })
-                logger.info("Binance exchange initialized")
-            except Exception as e:
-                logger.error(f"Failed to initialize Binance: {e}")
+        # Binance and Binance2
+        for exchange_name in ['binance', 'binance2']:
+            if exchange_name in self.config['exchanges'] and self.config['exchanges'][exchange_name]['enabled']:
+                try:
+                    self.exchanges[exchange_name] = ccxt.binance({
+                        'apiKey': self.config['exchanges'][exchange_name]['api_key'],
+                        'secret': self.config['exchanges'][exchange_name]['api_secret'],
+                        'sandbox': self.config['exchanges'][exchange_name]['sandbox'],
+                        'enableRateLimit': True,
+                    })
+                    logger.info(f"{exchange_name} exchange initialized")
+                except Exception as e:
+                    logger.error(f"Failed to initialize {exchange_name}: {e}")
         
         # HTX - 使用直接API调用
         if self.config['exchanges']['htx']['enabled']:
